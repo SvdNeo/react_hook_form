@@ -1,16 +1,46 @@
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
 
 type formValues = {
   username: string;
   email: string;
   channel: string;
+  Social:{
+    twitter: string,
+    facebook:string
+  }
+  phoneNumbers: string[];
+  phNumbers : {
+    number: string
+  }[]
 };
 
 export const YouTubeForm = () => {
-  const form = useForm<formValues>();
+  const form = useForm<formValues>(
+    {
+      defaultValues: {
+        username: "",
+        email: "",
+        channel: "",
+        Social:{
+          twitter: "",
+          facebook:""
+        },
+        phoneNumbers: ["",""],
+        phNumbers:[{
+          number:""
+        }]
+      },
+    
+     
+    },
+  );
   const { register, control, handleSubmit, formState } = form;
   const { errors } = formState;
+  const {fields,append,remove}  = useFieldArray({
+    control,
+    name: "phNumbers"
+  })
   const onSubmit = (data: formValues) => {
     console.log(data);
   };
@@ -38,10 +68,15 @@ export const YouTubeForm = () => {
                 value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
                 message: "invalid email",
               },
-              validate: (fieldValue) => {
-                return (
-                  fieldValue !== "admin@example.com" || "Enter different mail id"
-                );
+              validate: {
+                notValid:(fieldValue) => {
+                  return (
+                    fieldValue !== "admin@example.com" || "Enter different mail id"
+                  );
+                },
+                notBlackListed: (fieldValue) => {
+                return (!fieldValue.endsWith("@badDomain.com") || "This domain is not supported")
+              },
               },
             })}
           />
@@ -58,6 +93,57 @@ export const YouTubeForm = () => {
           />
           <p className="error">{errors.channel?.message}</p>
         </div>
+        <div className="form-control">
+          <label htmlFor="twitter">twitter</label>
+          <input
+            type="text"
+            id="channel"
+            {...register("Social.twitter")}
+          />
+         
+        </div>
+        <div className="form-control">
+          <label htmlFor="facebook">Facebook</label>
+          <input
+            type="text"
+            id="channel"
+            {...register("Social.facebook")}
+          />
+          
+        </div>
+        <div className="form-control">
+          <label htmlFor="primary-phone-number">Primary-Phone-Number</label>
+          <input
+            type="text"
+            id="primary"
+            {...register("phoneNumbers.0")}
+          />
+          
+        </div>
+        <div className="form-control">
+          <label htmlFor="secondary-phone-number">Primary-Phone-Number</label>
+          <input
+            type="text"
+            id="secondary"
+            {...register("phoneNumbers.1")}
+          />
+          
+        </div>
+        <div>
+            <label>List of Phone Numbers</label>
+            <div>
+              {fields.map((field,index)=>{
+                return(
+                  <div className="form-control" key={field.id}>
+                    <input type="text" {...register(`phNumbers.${index}.number` as const)}/>
+                    <button type="button" onClick={()=>remove(index)}>Remove</button>
+                  </div>
+                )
+                }) 
+              }
+            </div>
+          </div>
+       <button type="button" onClick={()=>append({number:""})}>Add</button>
         <button type="submit">Submit</button>
       </form>
       <DevTool control={control} />
