@@ -13,6 +13,8 @@ type formValues = {
   phNumbers : {
     number: string
   }[]
+  age:number;
+  dob:Date;
 };
 
 export const YouTubeForm = () => {
@@ -29,7 +31,9 @@ export const YouTubeForm = () => {
         phoneNumbers: ["",""],
         phNumbers:[{
           number:""
-        }]
+        }],
+        age:0,
+        dob:new Date()
       },
     
      
@@ -143,7 +147,34 @@ export const YouTubeForm = () => {
               }
             </div>
           </div>
+         
        <button type="button" onClick={()=>append({number:""})}>Add</button>
+       <div className="form-control">
+          <label htmlFor="age">Age</label>
+          <input
+        
+            type="number"
+            id="age"
+            {...register("age", {
+              valueAsNumber: true,
+              required: { value: true, message: "Age is required" },
+            })}
+          />
+          <p className="error">{errors.age?.message}</p>
+        </div>
+        <div className="form-control">
+          <label htmlFor="dob">DOB</label>
+          <input
+        
+            type="date"
+            id="age"
+            {...register("dob", {
+              valueAsDate: true,
+              required: { value: true, message: "Age is required" },
+            })}
+          />
+          <p className="error">{errors.dob?.message}</p>
+        </div>
         <button type="submit">Submit</button>
       </form>
       <DevTool control={control} />
